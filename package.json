@@ -1,5 +1,5 @@
 {
-  "name": "server-test",
+  "name": "xr-labs-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,16 +10,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XRLabsProjects/server-test.git"
+    "url": "git+https://github.com/XRLabsProjects/xr-labs-server.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/XRLabsProjects/server-test/issues"
+    "url": "https://github.com/XRLabsProjects/xr-labs-server/issues"
   },
-  "homepage": "https://github.com/XRLabsProjects/server-test#readme",
+  "homepage": "https://github.com/XRLabsProjects/xr-labs-server#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
