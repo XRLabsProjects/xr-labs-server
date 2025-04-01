@@ -5,6 +5,7 @@ import {
     getFilteredSoftwareData,
     checkSoftwareAccessKeyValidity,
     addSoftwareData,
+    addLCSAData,
 } from "./mongoConnection.js";
 
 // import isEmail from "validator/lib/isEmail.js";
@@ -20,6 +21,8 @@ app.get("/api/", (req, res) => {
     console.log("Server received call to path /");
     res.send("Server is ready");
 });
+
+/// SOFTWARE LEARNING WEBSITE ///
 
 app.get("/api/getSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/getSoftwareData");
@@ -108,6 +111,66 @@ app.post("/api/addSoftwareData", async (req, res) => {
 //         res.send(true);
 //     }
 // });
+
+
+
+/// LCSA TRACKER WEBSITE ///
+
+app.get("/api/getLcsaQuestionnaireData", async (req, res) => {
+    console.log("Server received call to path /api/getLcsaQuestionnaireData");
+    // const data = await getSoftwareData();
+    // const outputData = [];
+    // data.forEach((doc) => {
+    //     outputData.push({
+    //         companyName: doc.companyName,
+    //         capacityForUse: doc.capacityForUse,
+    //         country: doc.country,
+    //         field: doc.field,
+    //         softwareUsed: doc.softwareUsed,
+    //         otherSoftwareUsed: doc.otherSoftwareUsed,
+    //         year: doc.year,
+    //     });
+    // });
+    // res.send(outputData);
+});
+
+app.post("/api/getFilteredLcsaQuestionnaireData", async (req, res) => {
+    console.log("Server received call to path /api/getFilteredLcsaQuestionnaireData");
+    // const data = await getFilteredSoftwareData(req.body);
+    // const outputData = [];
+    // data.forEach((doc) => {
+    //     outputData.push({
+    //         companyName: doc.companyName,
+    //         capacityForUse: doc.capacityForUse,
+    //         country: doc.country,
+    //         field: doc.field,
+    //         softwareUsed: doc.softwareUsed,
+    //         otherSoftwareUsed: doc.otherSoftwareUsed,
+    //         year: doc.year,
+    //     });
+    // });
+    // res.send(outputData);
+});
+
+app.post("/api/checkLcsaAccessKey", async (req, res) => {
+    console.log("Server received call to path /api/checkLcsaAccessKey");
+    // const isKeyValid = await checkSoftwareAccessKeyValidity(
+    //     req.body.key.toUpperCase(),
+    // );
+    // res.send(isKeyValid);
+});
+
+app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
+    console.log("Server received call to path /api/addLcsaQuestionnaireData");
+    const response = await addLCSAData(req.body);
+    console.log(response);
+    res.send(response);
+});
+
+
+
+
+/// GLOBAL ///
 
 app.listen(port, () => {
     console.log(`Server listening at port: ${port}`);

@@ -3,8 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const databaseName = process.env.SOFTWARE_DB_NAME;
-const uri = process.env.SOFTWARE_DB_URI;
+const uri = process.env.DB_URI;
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -17,7 +16,7 @@ export async function getSoftwareData() {
     let data = null;
     try {
         const connection = await client.connect();
-        const database = await connection.db(databaseName);
+        const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         data = await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
             .find({
@@ -26,7 +25,7 @@ export async function getSoftwareData() {
             .toArray();
     } catch {
         console.log(
-            `Failed to connect -- ${databaseName}  whilst trying to get software data`,
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME}  whilst trying to get software data`,
         );
     }
     await client.close();
@@ -38,14 +37,14 @@ export async function getFilteredSoftwareData(query) {
     try {
         const queryObject = Object.assign({}, ...query);
         const connection = await client.connect();
-        const database = await connection.db(databaseName);
+        const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         data = await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
             .find(queryObject)
             .toArray();
     } catch {
         console.log(
-            `Failed to connect -- ${databaseName}  whilst trying to get software data`,
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME}  whilst trying to get filtered software data`,
         );
     }
     await client.close();
@@ -56,14 +55,14 @@ export async function checkSoftwareAccessKeyValidity(keyToQuery) {
     let isValidKey = false;
     try {
         const connection = await client.connect();
-        const database = await connection.db(databaseName);
+        const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         const result = await database
             .collection(process.env.SOFTWARE_DB_ACCESS_KEYS)
             .findOne({ key: keyToQuery });
         isValidKey = result != null;
     } catch {
         console.log(
-            `Failed to connect -- ${databaseName} whilst trying to check key validity`,
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to check software key validity`,
         );
     }
     await client.close();
@@ -74,7 +73,7 @@ export async function addSoftwareData(data) {
     let dataSuccessfullyAdded = false;
     try {
         const connection = await client.connect();
-        const database = await connection.db(databaseName);
+        const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
             .insertOne({
@@ -89,7 +88,26 @@ export async function addSoftwareData(data) {
         dataSuccessfullyAdded = true;
     } catch {
         console.log(
-            `Failed to connect -- ${databaseName} whilst trying to check key validity`,
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to add software data`,
+        );
+    }
+    await client.close();
+    return dataSuccessfullyAdded;
+}
+
+export async function addLCSAData(data) {
+    // TODO: confirm object structure is valid
+    let dataSuccessfullyAdded = false;
+    try {
+        const connection = await client.connect();
+        const database = await connection.db(process.env.LCSA_DB_NAME);
+        await database
+            .collection(process.env.LCSA_DB_DATA_COLLECTION)
+            .insertOne(data);
+        dataSuccessfullyAdded = true;
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA data`,
         );
     }
     await client.close();
