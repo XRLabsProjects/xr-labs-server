@@ -3,19 +3,22 @@ import cors from "cors";
 import {
     getSoftwareData,
     getFilteredSoftwareData,
-    checkAccessKeyValidity,
-    addData,
+    checkSoftwareAccessKeyValidity,
+    addSoftwareData,
 } from "./mongoConnection.js";
 
-const port = process.env.SERVER_PORT;
+// import isEmail from "validator/lib/isEmail.js";
+// import nodemailer from "nodemailer";
+
 const app = express();
+const port = process.env.SERVER_PORT;
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
     console.log("Server received call to path /");
-    res.send("This is the default server path, it comes from nothing and leads to nothing. It's purpose is to exist and to test. That is all.");
+    res.send("Server is ready");
 });
 
 app.get("/api/getSoftwareData", async (req, res) => {
@@ -54,17 +57,57 @@ app.post("/api/getFilteredSoftwareData", async (req, res) => {
     res.send(outputData);
 });
 
-app.post("/api/addData", async (req, res) => {
-    console.log("Server received call to path /api/addData");
-    const response = await addData(req.body);
+app.post("/api/checkSoftwareAccessKey", async (req, res) => {
+    console.log("Server received call to path /api/checkSoftwareAccessKey");
+    const isKeyValid = await checkSoftwareAccessKeyValidity(
+        req.body.key.toUpperCase(),
+    );
+    res.send(isKeyValid);
+});
+
+app.post("/api/addSoftwareData", async (req, res) => {
+    console.log("Server received call to path /api/addSoftwareData");
+    const response = await addSoftwareData(req.body);
     res.send(true);
 });
 
-app.post("/api/checkAccessKey", async (req, res) => {
-    console.log("Server received call to path /api/checkAccessKey");
-    const isKeyValid = await checkAccessKeyValidity(req.body.key.toUpperCase());
-    res.send(isKeyValid);
-});
+// app.post("/api/sendEmail", async (req, res) => {
+//     console.log("Server received call to path /api/sendEmail");
+//     const { name, email, message } = req.body;
+//     if (!name || !email || !message || !isEmail(email)) {
+//         res.send(false);
+//     } else {
+//         const transporter = nodemailer.createTransport({
+//             host: process.env.SMTP_HOST,
+//             port: process.env.SMTP_PORT,
+//             secure: false, // use false for STARTTLS; true for SSL on port 465
+//             auth: {
+//                 user: process.env.SMTP_USER,
+//                 pass: process.env.SMTP_PASS,
+//             },
+//         });
+//
+//         const mailOptions = {
+//             from: process.env.EMAIL_FROM,
+//             to: process.env.EMAIL_TO,
+//             replyTo: email,
+//             subject: `Software Learning Contact Form: ${name}`,
+//             text: `Sender: ${name}\nEmail: ${email}\n\nContents: ${message}`,
+//         };
+//
+//         await transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//                 console.log("Failed to send email due to server error");
+//                 res.send(false);
+//             } else {
+//                 console.log("Successfully sent email");
+//                 return res.send(true);
+//             }
+//         });
+//
+//         res.send(true);
+//     }
+// });
 
 app.listen(port, () => {
     console.log(`Server listening at port: ${port}`);
