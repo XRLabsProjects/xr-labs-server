@@ -95,6 +95,53 @@ export async function addSoftwareData(data) {
     return dataSuccessfullyAdded;
 }
 
+export async function getAllLcsaData() {
+    let data = null;
+    try {
+        const connection = await client.connect();
+        const database = await connection.db(process.env.LCSA_DB_NAME);
+
+        data = await database
+            .collection(process.env.LCSA_DB_DATA_COLLECTION)
+            .find({ })
+            .project( { _id: 0 } )
+            .toArray();
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.LCSA_DB_NAME}  whilst trying to get all LCSA data`,
+        );
+    }
+    
+    await client.close();
+    return data;
+}
+
+export async function getFilteredLcsaFields(query) {
+    let data = null;
+    try {
+        const connection = await client.connect();
+        const database = await connection.db(process.env.LCSA_DB_NAME);
+
+        const orQuery = Object.keys(query).map(field => ({ [field]: { $exists: true } }));
+        const projection = Object.keys(query).reduce((acc, field) => {
+            acc[field] = 1;
+            return acc;
+        }, { _id: 0 });
+
+        data = await database
+            .collection(process.env.LCSA_DB_DATA_COLLECTION)
+            .find({ $or: orQuery })
+            .project( projection )
+            .toArray();
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.LCSA_DB_NAME}  whilst trying to get filtered LCSA fields`,
+        );
+    }
+    await client.close();
+    return data;
+}
+
 export async function addLCSAData(data) {
     // TODO: confirm object structure is valid
     let dataSuccessfullyAdded = false;

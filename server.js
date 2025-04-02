@@ -5,6 +5,8 @@ import {
     getFilteredSoftwareData,
     checkSoftwareAccessKeyValidity,
     addSoftwareData,
+    getAllLcsaData,
+    getFilteredLcsaFields,
     addLCSAData,
 } from "./mongoConnection.js";
 
@@ -23,7 +25,7 @@ app.get("/api/", (req, res) => {
 });
 
 /// SOFTWARE LEARNING WEBSITE ///
-
+// FIXME: FILTER OUT ID IN THE MONGODB REQUEST (SEE LCSA EXAMPLES USING PROJECTION { _id: 0 }
 app.get("/api/getSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/getSoftwareData");
     const data = await getSoftwareData();
@@ -42,6 +44,8 @@ app.get("/api/getSoftwareData", async (req, res) => {
     res.send(outputData);
 });
 
+// FIXME: RENAME TO MORE ACCURATELY REFLECT WHAT THIS FILTERING DOES
+    // Get all data for entries that match specific requirements
 app.post("/api/getFilteredSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/getFilteredSoftwareData");
     const data = await getFilteredSoftwareData(req.body);
@@ -116,40 +120,16 @@ app.post("/api/addSoftwareData", async (req, res) => {
 
 /// LCSA TRACKER WEBSITE ///
 
-app.get("/api/getLcsaQuestionnaireData", async (req, res) => {
-    console.log("Server received call to path /api/getLcsaQuestionnaireData");
-    // const data = await getSoftwareData();
-    // const outputData = [];
-    // data.forEach((doc) => {
-    //     outputData.push({
-    //         companyName: doc.companyName,
-    //         capacityForUse: doc.capacityForUse,
-    //         country: doc.country,
-    //         field: doc.field,
-    //         softwareUsed: doc.softwareUsed,
-    //         otherSoftwareUsed: doc.otherSoftwareUsed,
-    //         year: doc.year,
-    //     });
-    // });
-    // res.send(outputData);
+app.get("/api/getAllLcsaQuestionnaireData", async (req, res) => {
+    console.log("Server received call to path /api/getAllLcsaQuestionnaireData");
+    const data = await getAllLcsaData();
+    res.send(data);
 });
 
-app.post("/api/getFilteredLcsaQuestionnaireData", async (req, res) => {
-    console.log("Server received call to path /api/getFilteredLcsaQuestionnaireData");
-    // const data = await getFilteredSoftwareData(req.body);
-    // const outputData = [];
-    // data.forEach((doc) => {
-    //     outputData.push({
-    //         companyName: doc.companyName,
-    //         capacityForUse: doc.capacityForUse,
-    //         country: doc.country,
-    //         field: doc.field,
-    //         softwareUsed: doc.softwareUsed,
-    //         otherSoftwareUsed: doc.otherSoftwareUsed,
-    //         year: doc.year,
-    //     });
-    // });
-    // res.send(outputData);
+app.post("/api/getFilteredLcsaQuestionnaireFields", async (req, res) => {
+    console.log("Server received call to path /api/getFilteredLcsaQuestionnaireFields");
+    const data = await getFilteredLcsaFields(req.body);
+    res.send(data);
 });
 
 app.post("/api/checkLcsaAccessKey", async (req, res) => {
@@ -162,13 +142,22 @@ app.post("/api/checkLcsaAccessKey", async (req, res) => {
 
 app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
     console.log("Server received call to path /api/addLcsaQuestionnaireData");
-    const response = await addLCSAData(req.body);
-    console.log(response);
+    // defines the structure for data in the database -- to be honest this data is very loose
+    const inputData = {
+        ageGroup: req.body.ageGroup,
+        experience: req.body.experienceWithLCA,
+        gender: req.body.gender,
+        easyToUse: req.body.easyToUseScale,
+        quickToLearn: req.body.quickToLearnScale,
+        engaging: req.body.engagingScale,
+        enjoyment: req.body.enjoymentScale,
+        limitationsAndBarriers: req.body.limitationsAndBarriers,
+        opportunitiesAndPotential: req.body.opportunitiesAndPotential,
+        time: req.body.time,
+    }
+    const response = await addLCSAData(inputData);
     res.send(response);
 });
-
-
-
 
 /// GLOBAL ///
 
