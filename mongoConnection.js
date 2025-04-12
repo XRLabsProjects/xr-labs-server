@@ -11,7 +11,10 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
-const clientPromise = client.connect();
+const clientPromise = client.connect().catch((err) => {
+    // TODO: open new connection
+    console.error("Connection crashed: " + err);
+});
 
 export async function getSoftwareData() {
     let data = null;
@@ -26,7 +29,7 @@ export async function getSoftwareData() {
             .toArray();
     } catch {
         console.log(
-            `Failed to connect to ${process.env.SOFTWARE_DB_NAME}  whilst trying to get software data`,
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to get software data`,
         );
     }
     return data;
@@ -153,6 +156,27 @@ export async function addLCSAData(data) {
         );
     }
     return dataSuccessfullyAdded;
+}
+
+export async function getLCSAAnalyticsData() {
+    let data = null;
+    try {
+        const connection = await clientPromise;
+        const database = connection.db(process.env.LCSA_DB_NAME);
+        const collection = database.collection(process.env.LCSA_DB_ANALYTICS);
+
+        data = collection
+            .find({ })
+            .project( { _id: 0 } )
+            .toArray();
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to get LCSA analytics data`,
+        );
+        return false;
+    }
+    
+    return data;
 }
 
 export async function updateLCSAAnalytic(data) {

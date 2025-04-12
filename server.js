@@ -8,6 +8,7 @@ import {
     getAllLcsaData,
     getFilteredLcsaFields,
     addLCSAData,
+    getLCSAAnalyticsData,
     updateLCSAAnalytic,
 } from "./mongoConnection.js";
 
@@ -26,7 +27,7 @@ app.get("/api/", (req, res) => {
 });
 
 /// SOFTWARE LEARNING WEBSITE ///
-// FIXME: FILTER OUT ID IN THE MONGODB REQUEST (SEE LCSA EXAMPLES USING PROJECTION { _id: 0 }
+// FIXME: FILTER OUT ID IN THE MONGODB REQUEST (SEE LCSA EXAMPLES USING PROJECTION { _id: 0 })
 app.get("/api/getSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/getSoftwareData");
     const data = await getSoftwareData();
@@ -158,6 +159,12 @@ app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
     }
     const response = await addLCSAData(inputData);
     res.send(response);
+});
+
+app.get("/api/getLcsaAnalyticsData", async (req, res) => {
+    console.log("Server received call to path /api/getLcsaAnalyticsData");
+    const data = await getLCSAAnalyticsData();
+    res.send(data);
 });
 
 app.post("/api/updateLcsaAnalytics", async (req, res) => {
