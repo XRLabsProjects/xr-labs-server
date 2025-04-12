@@ -160,3 +160,22 @@ export async function addLCSAData(data) {
     await client.close();
     return dataSuccessfullyAdded;
 }
+
+export async function updateLCSAAnalytic(analytic) {
+    try {
+        const connection = await client.connect();
+        const database = await connection.db(process.env.LCSA_DB_NAME);
+        await database
+            .collection(process.env.LCSA_DB_ANALYTICS)
+            .updateOne(
+                { name: analytic },
+                { $inc: { count: 1 } },
+                { upsert: true }
+            );
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA analytics data`,
+        );
+    }
+    await client.close();
+}

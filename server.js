@@ -8,6 +8,7 @@ import {
     getAllLcsaData,
     getFilteredLcsaFields,
     addLCSAData,
+    updateLCSAAnalytic,
 } from "./mongoConnection.js";
 
 // import isEmail from "validator/lib/isEmail.js";
@@ -142,7 +143,7 @@ app.post("/api/checkLcsaAccessKey", async (req, res) => {
 
 app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
     console.log("Server received call to path /api/addLcsaQuestionnaireData");
-    // defines the structure for data in the database -- to be honest this data is very loose
+    // defines the structure for data in the database -- to be honest this code is very loose
     const inputData = {
         ageGroup: req.body.ageGroup,
         experience: req.body.experienceWithLCA,
@@ -156,6 +157,15 @@ app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
         time: req.body.time,
     }
     const response = await addLCSAData(inputData);
+    res.send(response);
+});
+
+app.post("/api/updateLcsaAnalytics", async (req, res) => {
+    console.log("Server received call to path /api/updateLcsaAnalytics");
+    if (!req.body || req.body.length <= 0) {
+        res.send(false);
+    }
+    const response = await updateLCSAAnalytic(req.body);
     res.send(response);
 });
 
