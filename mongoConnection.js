@@ -161,17 +161,43 @@ export async function addLCSAData(data) {
     return dataSuccessfullyAdded;
 }
 
-export async function updateLCSAAnalytic(analytic) {
+export async function updateLCSAAnalytic(data) {
     try {
         const connection = await client.connect();
-        const database = await connection.db(process.env.LCSA_DB_NAME);
-        await database
-            .collection(process.env.LCSA_DB_ANALYTICS)
-            .updateOne(
-                { name: analytic },
-                { $inc: { count: 1 } },
+        const database = connection.db(process.env.LCSA_DB_NAME);
+        const collection = database.collection(process.env.LCSA_DB_ANALYTICS);
+
+        const currentDate = new Date();
+        const monthYear = `${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getFullYear()}`;
+        
+        // checks if existing valid data entry exists
+        const result = await collection.updateOne(
+            {
+                name: data,
+                "monthYearData.monthYear": monthYear,
+            },
+            {
+                $inc: { "monthYearData.$.count": 1 },
+            }
+        );
+        
+        // creates new data entry if valid entry didn't exist
+        if (result.matchedCount === 0) {
+            await collection.updateOne(
+                { name: data },
+                {
+                    $setOnInsert: { name: data },
+                    // add monthYear object with count to an array of month years
+                    $push: {
+                        monthYearData: {
+                            monthYear: monthYear,
+                            count: 1,
+                        },
+                    },
+                },
                 { upsert: true }
             );
+        }
     } catch {
         console.log(
             `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA analytics data`,

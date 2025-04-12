@@ -161,11 +161,12 @@ app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
 });
 
 app.post("/api/updateLcsaAnalytics", async (req, res) => {
-    console.log("Server received call to path /api/updateLcsaAnalytics");
-    if (!req.body || req.body.length <= 0) {
+    const analytic = req.body.analytic;
+    console.log("Server received call to path /api/updateLcsaAnalytics for analytic " + analytic);
+    if (!analytic || analytic.length <= 0) {
         res.send(false);
     }
-    const response = await updateLCSAAnalytic(req.body);
+    const response = await updateLCSAAnalytic(analytic);
     res.send(response);
 });
 
