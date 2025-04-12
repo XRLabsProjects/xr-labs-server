@@ -11,11 +11,12 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
+const clientPromise = client.connect();
 
 export async function getSoftwareData() {
     let data = null;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         data = await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
@@ -28,7 +29,6 @@ export async function getSoftwareData() {
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME}  whilst trying to get software data`,
         );
     }
-    await client.close();
     return data;
 }
 
@@ -36,7 +36,7 @@ export async function getFilteredSoftwareData(query) {
     let data = null;
     try {
         const queryObject = Object.assign({}, ...query);
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         data = await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
@@ -47,14 +47,13 @@ export async function getFilteredSoftwareData(query) {
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME}  whilst trying to get filtered software data`,
         );
     }
-    await client.close();
     return data;
 }
 
 export async function checkSoftwareAccessKeyValidity(keyToQuery) {
     let isValidKey = false;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         const result = await database
             .collection(process.env.SOFTWARE_DB_ACCESS_KEYS)
@@ -65,14 +64,13 @@ export async function checkSoftwareAccessKeyValidity(keyToQuery) {
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to check software key validity`,
         );
     }
-    await client.close();
     return isValidKey;
 }
 
 export async function addSoftwareData(data) {
     let dataSuccessfullyAdded = false;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
@@ -91,14 +89,13 @@ export async function addSoftwareData(data) {
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to add software data`,
         );
     }
-    await client.close();
     return dataSuccessfullyAdded;
 }
 
 export async function getAllLcsaData() {
     let data = null;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.LCSA_DB_NAME);
 
         data = await database
@@ -112,14 +109,13 @@ export async function getAllLcsaData() {
         );
     }
     
-    await client.close();
     return data;
 }
 
 export async function getFilteredLcsaFields(query) {
     let data = null;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.LCSA_DB_NAME);
 
         const orQuery = Object.keys(query).map(field => ({ [field]: { $exists: true } }));
@@ -138,7 +134,6 @@ export async function getFilteredLcsaFields(query) {
             `Failed to connect to ${process.env.LCSA_DB_NAME}  whilst trying to get filtered LCSA fields`,
         );
     }
-    await client.close();
     return data;
 }
 
@@ -146,7 +141,7 @@ export async function addLCSAData(data) {
     // TODO: confirm object structure is valid
     let dataSuccessfullyAdded = false;
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = await connection.db(process.env.LCSA_DB_NAME);
         await database
             .collection(process.env.LCSA_DB_DATA_COLLECTION)
@@ -157,13 +152,12 @@ export async function addLCSAData(data) {
             `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA data`,
         );
     }
-    await client.close();
     return dataSuccessfullyAdded;
 }
 
 export async function updateLCSAAnalytic(data) {
     try {
-        const connection = await client.connect();
+        const connection = await clientPromise;
         const database = connection.db(process.env.LCSA_DB_NAME);
         const collection = database.collection(process.env.LCSA_DB_ANALYTICS);
 
@@ -202,6 +196,7 @@ export async function updateLCSAAnalytic(data) {
         console.log(
             `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA analytics data`,
         );
+        return false;
     }
-    await client.close();
+    return true;
 }
