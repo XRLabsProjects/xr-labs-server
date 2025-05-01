@@ -53,13 +53,13 @@ export async function getFilteredSoftwareData(query) {
     return data;
 }
 
-export async function checkSoftwareAccessKeyValidity(keyToQuery) {
+export async function checkSoftwareAccessKeyValidity(keyToQuery, isAdmin) {
     let isValidKey = false;
     try {
         const connection = await clientPromise;
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         const result = await database
-            .collection(process.env.SOFTWARE_DB_ACCESS_KEYS)
+            .collection(isAdmin ? process.env.SOFTWARE_DB_ADMIN_KEYS : process.env.SOFTWARE_DB_ACCESS_KEYS)
             .findOne({ key: keyToQuery });
         isValidKey = result != null;
     } catch {

@@ -70,6 +70,7 @@ app.post("/api/checkSoftwareAccessKey", async (req, res) => {
     console.log("Server received call to path /api/checkSoftwareAccessKey");
     const isKeyValid = await checkSoftwareAccessKeyValidity(
         req.body.key.toUpperCase(),
+        req.body.isAdmin,
     );
     res.send(isKeyValid);
 });
