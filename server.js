@@ -150,6 +150,8 @@ app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
         ageGroup: req.body.ageGroup,
         experience: req.body.experienceWithLCA,
         gender: req.body.gender,
+        occupation: req.body.occupation,
+        country: req.body.country,
         easyToUse: req.body.easyToUseScale,
         quickToLearn: req.body.quickToLearnScale,
         engaging: req.body.engagingScale,

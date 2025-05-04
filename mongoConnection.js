@@ -120,8 +120,11 @@ export async function getFilteredLcsaFields(query) {
     try {
         const connection = await clientPromise;
         const database = await connection.db(process.env.LCSA_DB_NAME);
-
+        
+        // Checks if each field in the query exists
         const orQuery = Object.keys(query).map(field => ({ [field]: { $exists: true } }));
+        
+        // Only include specified fields in the result (not including id)
         const projection = Object.keys(query).reduce((acc, field) => {
             acc[field] = 1;
             return acc;
