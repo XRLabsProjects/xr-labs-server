@@ -145,20 +145,22 @@ app.post("/api/checkLcsaAccessKey", async (req, res) => {
 
 app.post("/api/addLcsaQuestionnaireData", async (req, res) => {
     console.log("Server received call to path /api/addLcsaQuestionnaireData");
+    const data = req.body;
+    
     // defines the structure for data in the database -- to be honest this code is very loose
     const inputData = {
-        ageGroup: req.body.ageGroup,
-        experience: req.body.experienceWithLCA,
-        gender: req.body.gender,
-        occupation: req.body.occupation,
-        country: req.body.country,
-        easyToUse: req.body.easyToUseScale,
-        quickToLearn: req.body.quickToLearnScale,
-        engaging: req.body.engagingScale,
-        enjoyment: req.body.enjoymentScale,
-        limitationsAndBarriers: req.body.limitationsAndBarriers,
-        opportunitiesAndPotential: req.body.opportunitiesAndPotential,
-        time: req.body.time,
+        ageGroup: data.ageGroup,
+        experience: data.experienceWithLCA,
+        gender: data.gender,
+        occupation: data.occupation,
+        country: data.country,
+        easyToUse: data.easyToUseScale,
+        quickToLearn: data.quickToLearnScale,
+        engaging: data.engagingScale,
+        enjoyment: data.enjoymentScale,
+        limitationsAndBarriers: data.limitationsAndBarriers,
+        opportunitiesAndPotential: data.opportunitiesAndPotential,
+        time: data.time,
     }
     const response = await addLCSAData(inputData);
     res.send(response);
