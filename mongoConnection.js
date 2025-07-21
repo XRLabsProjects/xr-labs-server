@@ -92,12 +92,15 @@ export async function getSoftwareSurveyCount() {
         const database = await connection.db(process.env.SOFTWARE_DB_NAME);
         data = await database
             .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
-            .countDocuments();
+            .countDocuments({
+                softwareUsed: { $exists: true },
+            });
     } catch {
         console.log(
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to get entries count`,
         );
     }
+    console.log(data);
     return data;
 }
 
