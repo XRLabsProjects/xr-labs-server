@@ -5,6 +5,8 @@ import {
     getFilteredSoftwareData,
     checkSoftwareAccessKeyValidity,
     addSoftwareData,
+    getSoftwareAnalyticsData,
+    updateSoftwareAnalytic,
     getAllLcsaData,
     getFilteredLcsaFields,
     addLCSAData,
@@ -79,6 +81,22 @@ app.post("/api/addSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/addSoftwareData");
     const response = await addSoftwareData(req.body);
     res.send(true);
+});
+
+app.get("/api/getSoftwareAnalyticsData", async (req, res) => {
+    console.log("Server received call to path /api/getLcsaAnalyticsData");
+    const data = await getSoftwareAnalyticsData();
+    res.send(data);
+});
+
+app.post("/api/updateSoftwareAnalytics", async (req, res) => {
+    const analytic = req.body.analytic;
+    console.log("Server received call to path /api/updateSoftwareAnalytics for analytic " + analytic);
+    if (!analytic || analytic.length <= 0) {
+        res.send(false);
+    }
+    const response = await updateSoftwareAnalytic(analytic);
+    res.send(response);
 });
 
 // app.post("/api/sendEmail", async (req, res) => {

@@ -16,6 +16,74 @@ const clientPromise = client.connect().catch((err) => {
     console.error("Connection crashed: " + err);
 });
 
+
+async function getAnalyticsData(databaseName, collectionName) {
+    let data = null;
+    try {
+        const connection = await clientPromise;
+        const database = connection.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        data = collection
+            .find({ })
+            .project( { _id: 0 } )
+            .toArray();
+    } catch {
+        console.log(
+            `Failed to connect to ${databaseName} whilst trying to get analytics data`,
+        );
+        return false;
+    }
+
+    return data;
+}
+
+async function addAnalyticsData(data, databaseName, collectionName) {
+    try {
+        const connection = await clientPromise;
+        const database = connection.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        const currentDate = new Date();
+        const monthYear = `${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getFullYear()}`;
+
+        // checks if existing valid data entry exists
+        const result = await collection.updateOne(
+            {
+                name: data,
+                "monthYearData.monthYear": monthYear,
+            },
+            {
+                $inc: { "monthYearData.$.count": 1 },
+            }
+        );
+
+        // creates new data entry if valid entry didn't exist
+        if (result.matchedCount === 0) {
+            await collection.updateOne(
+                { name: data },
+                {
+                    $setOnInsert: { name: data },
+                    // add monthYear object with count to an array of month years
+                    $push: {
+                        monthYearData: {
+                            monthYear: monthYear,
+                            count: 1,
+                        },
+                    },
+                },
+                { upsert: true }
+            );
+        }
+    } catch {
+        console.log(
+            `Failed to connect to ${databaseName} whilst trying to add analytics data`,
+        );
+        return false;
+    }
+    return true;
+}
+
 export async function getSoftwareData() {
     let data = null;
     try {
@@ -95,6 +163,14 @@ export async function addSoftwareData(data) {
     return dataSuccessfullyAdded;
 }
 
+export async function getSoftwareAnalyticsData() {
+    return getAnalyticsData(process.env.SOFTWARE_DB_NAME, process.env.SOFTWARE_DB_ANALYTICS);
+}
+
+export async function updateSoftwareAnalytic(data) {
+    return addAnalyticsData(data, process.env.SOFTWARE_DB_NAME, process.env.SOFTWARE_DB_ANALYTICS);
+}
+
 export async function getAllLcsaData() {
     let data = null;
     try {
@@ -162,68 +238,9 @@ export async function addLCSAData(data) {
 }
 
 export async function getLCSAAnalyticsData() {
-    let data = null;
-    try {
-        const connection = await clientPromise;
-        const database = connection.db(process.env.LCSA_DB_NAME);
-        const collection = database.collection(process.env.LCSA_DB_ANALYTICS);
-
-        data = collection
-            .find({ })
-            .project( { _id: 0 } )
-            .toArray();
-    } catch {
-        console.log(
-            `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to get LCSA analytics data`,
-        );
-        return false;
-    }
-    
-    return data;
+    return getAnalyticsData(process.env.LCSA_DB_NAME, process.env.LCSA_DB_ANALYTICS);
 }
 
 export async function updateLCSAAnalytic(data) {
-    try {
-        const connection = await clientPromise;
-        const database = connection.db(process.env.LCSA_DB_NAME);
-        const collection = database.collection(process.env.LCSA_DB_ANALYTICS);
-
-        const currentDate = new Date();
-        const monthYear = `${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getFullYear()}`;
-        
-        // checks if existing valid data entry exists
-        const result = await collection.updateOne(
-            {
-                name: data,
-                "monthYearData.monthYear": monthYear,
-            },
-            {
-                $inc: { "monthYearData.$.count": 1 },
-            }
-        );
-        
-        // creates new data entry if valid entry didn't exist
-        if (result.matchedCount === 0) {
-            await collection.updateOne(
-                { name: data },
-                {
-                    $setOnInsert: { name: data },
-                    // add monthYear object with count to an array of month years
-                    $push: {
-                        monthYearData: {
-                            monthYear: monthYear,
-                            count: 1,
-                        },
-                    },
-                },
-                { upsert: true }
-            );
-        }
-    } catch {
-        console.log(
-            `Failed to connect to ${process.env.LCSA_DB_NAME} whilst trying to add LCSA analytics data`,
-        );
-        return false;
-    }
-    return true;
+    return addAnalyticsData(data, process.env.LCSA_DB_NAME, process.env.LCSA_DB_ANALYTICS);
 }
