@@ -5,6 +5,7 @@ import {
     getFilteredSoftwareData,
     checkSoftwareAccessKeyValidity,
     addSoftwareData,
+    getSoftwareSurveyCount,
     getSoftwareAnalyticsData,
     updateSoftwareAnalytic,
     getAllLcsaData,
@@ -81,6 +82,12 @@ app.post("/api/addSoftwareData", async (req, res) => {
     console.log("Server received call to path /api/addSoftwareData");
     const response = await addSoftwareData(req.body);
     res.send(true);
+});
+
+app.get("/api/getSoftwareSurveyCount", async (req, res) => {
+    console.log("Server received call to path /api/getSoftwareSurveyCount");
+    const data = await getSoftwareSurveyCount();
+    res.send(data);
 });
 
 app.get("/api/getSoftwareAnalyticsData", async (req, res) => {

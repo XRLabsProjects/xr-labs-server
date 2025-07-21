@@ -84,6 +84,23 @@ async function addAnalyticsData(data, databaseName, collectionName) {
     return true;
 }
 
+// TODO: Remove repeated code
+export async function getSoftwareSurveyCount() {
+    let data = null;
+    try {
+        const connection = await clientPromise;
+        const database = await connection.db(process.env.SOFTWARE_DB_NAME);
+        data = await database
+            .collection(process.env.SOFTWARE_DB_DATA_COLLECTION)
+            .countDocuments();
+    } catch {
+        console.log(
+            `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to get entries count`,
+        );
+    }
+    return data;
+}
+
 export async function getSoftwareData() {
     let data = null;
     try {
