@@ -100,7 +100,6 @@ export async function getSoftwareSurveyCount() {
             `Failed to connect to ${process.env.SOFTWARE_DB_NAME} whilst trying to get entries count`,
         );
     }
-    console.log(data);
     return data;
 }
 

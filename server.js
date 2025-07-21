@@ -86,9 +86,10 @@ app.post("/api/addSoftwareData", async (req, res) => {
 
 app.get("/api/getSoftwareSurveyCount", async (req, res) => {
     console.log("Server received call to path /api/getSoftwareSurveyCount");
-    const data = await getSoftwareSurveyCount();
-    console.log(data);
-    res.send(data);
+    const surveyCount = await getSoftwareSurveyCount();
+    console.log(surveyCount);
+    
+    res.send({count: surveyCount});
 });
 
 app.get("/api/getSoftwareAnalyticsData", async (req, res) => {
